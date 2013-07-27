@@ -1,0 +1,97 @@
+1，入口文件
+自己创建一个index.php  里面require'/……/ThinkPHP/php';
+这行代码加载了ThinkPHP框架的入口文件ThinkPHP.php,这是所有基于ThinkPHP开发应用的第一步。
+
+2，配置
+独立的配置文件（Conf/config.php）
+
+3,控制器
+需要为每一个模块定义一个控制器类，控制器类的命名规范是：
+模块名+Action.class.php（模块名采用驼峰法并且首字母大写），系统默认的Index模块对应的控制器就是Lib/Action/IndexAction.class.php, 类名和文件名一致。？？？？？？？？？？？？？？？？？？？？这里是什么意思？
+答：就是这文件的名字要和这个文件里面写的这个类的名字要一样的，都是模块名+Action.class.php 。并且继承Action类，一个模块可以包含多个操作方法，但是只有public方法才可以被URL访问到。
+
+4，URL请求
+入口文件是项目的单一入口，对项目的所有请求夺回定向到项目的入口文件，系统会从RUL参数中解析当前请求的模块和操作，如果RUL地址中没有任何参数，则会访问默认的index模块的index操作。等价与……/index.php/Inde	      x/index  这里Index是模块，后面的index是方法。这种RUL模式就是系统默认的PATHINFO模式，不同RUL模式获取模块和操作函数的方法不同，ThinkPHP支持的URL模式有四种：普通模式，PATHINFO，REWRITE和兼容模式。
+
+5，试图
+ThinkPHP内置了一个编译型模板引擎，也支持原生版的PHP模板并且还提供了包括Smarty在内的模板引擎驱动。在渲染模板时如果不指定模板，则会采用系统默认的定位规则，其定义规范是Tpl/模板名/操作名.html。所以Index模块的index操作的默认模板文件位于项目目录下面的Tpl/Index/index.html。
+例如：
+<html>  
+<head>   
+<title>
+hello{$name}
+</title> 
+</head> 	
+<body>  
+hello, {$name}!  
+</body>
+</html>
+要输出视图就要在控制方法中进行模板渲染输出操作，就是对变量赋值什么的，再$this->display();该方法没有指定任何的模板，所以是默认的Index/index.html模板文件。
+这样就可以输出视图了。
+
+6，读取数据
+比如说我们要读取数据库中的数据，我们先建好了库，现在我们需要在项目配置文件中添加数据库链接信息如下：
+/ 添加数据库配置信息
+'DB_TYPE'   => 'mysql', // 数据库类型
+	'DB_HOST'   => 'localhost', // 服务器地址
+	'DB_NAME'   => 'thinkphp', // 数据库名
+	'DB_USER'   => 'root', // 用户名
+	'DB_PWD'    => '', // 密码
+	'DB_PORT'   => 3306, // 端口
+	'DB_PREFIX' => 'think_', // 数据库表前缀
+	或者采用如下配置：
+	'DB_DSN' => 'mysql://root@localhost:3306/thinkphp'
+	使用DB_DSN方式定义可以简化配置参数，DSN参数格式为：
+	数据库类型://用户名:密码@数据库地址:数据库端口/数据库名
+	如果两种配置参数同时存在的话，DB_DSN配置参数优先。
+
+	接下来就是改变控制器方法，添加读取数据的代码：
+	$Data = M('Data'); // 实例化Data数据模型 ，
+	$this->data = $Data->select();
+	$this->display();
+	这里只需要记住这样字就可已操作数据库就行了。这样以后我们就可以在模板文件里面输出对应的数据了。
+	如下：
+	<html>
+	<head>
+	<title>Select Data</title>
+	</head>
+	<body>
+	<volist name="data" id="vo">
+	{$vo.id}--{$vo.data}<br/>//这个volist标签是内置模板引擎用于输出数据集的标签。后面那个家伙就是输出字段。
+	</volist>
+	</body>
+	</html>
+	
+	这样子以后访问就可已看到应该输出的东西了。。
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
